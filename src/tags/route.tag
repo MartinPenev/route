@@ -4,18 +4,40 @@
 
   <script>
     this.show = false
+
     this.parent.route(opts.path, (...args) => {
-      // There's no way to intercept the child tags while mounting.
-      // We need to wait the `updated` event to access them via `this.tags`.
-      this.one('updated', () => {
-        flatten(this.tags).forEach(tag => {
-          tag.trigger('route', ...args)
-          tag.update()
-        })
-      })
-      this.parent.select(this)
-      this.parent.update()
-    })
+      if (this.parent.opts.interceptor) {
+        this.parent.opts.interceptor(this.opts).then(status => {
+          if (status) {
+            this.complete(args);
+          }
+        });
+      } else {
+        this.complete(args);
+      }
+    });
+
+    function complete(pathArgs) {
+        if (pathArgs.length == 1) {
+          args = pathArgs[0];
+        } else {
+          var args = [], len = pathArgs.length;
+          while (len--) args[len] = arguments[len];
+        }
+
+        this.on('updated', () => {
+          let tags = flatten(this.tags);
+          if (tags.length > 0) {
+            this.off("updated");
+
+            tags.forEach(function (tag) {
+              tag.trigger('route', ...args);
+            });
+          }
+        });
+
+        this.parent.select(this);
+    }
 
     function flatten(tags) {
       return Object.keys(tags)
