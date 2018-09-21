@@ -17,7 +17,7 @@
       }
     });
 
-    this.complete(pathArgs) {
+    this.complete = (pathArgs) => {
         if (pathArgs.length == 1) {
           args = pathArgs[0];
         } else {

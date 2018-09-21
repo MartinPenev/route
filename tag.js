@@ -44,6 +44,7 @@ riot.tag2('router', '<yield></yield>', '', '', function(opts) {
 });
 
 riot.tag2('route', '<virtual if="{show}"><yield></yield></virtual>', '', '', function(opts) {
+    var arguments$1 = arguments;
     var this$1 = this;
 
     this.show = false;
@@ -55,18 +56,15 @@ riot.tag2('route', '<virtual if="{show}"><yield></yield></virtual>', '', '', fun
       if (this$1.parent.opts.interceptor) {
         this$1.parent.opts.interceptor(this$1.opts).then(function (status) {
           if (status) {
-            complete(args);
+            this$1.complete(args);
           }
         });
       } else {
-        complete(args);
+        this$1.complete(args);
       }
     });
 
-    function complete(pathArgs) {
-        var arguments$1 = arguments;
-        var this$1 = this;
-
+    this.complete = function (pathArgs) {
         if (pathArgs.length == 1) {
           args = pathArgs[0];
         } else {
@@ -74,7 +72,7 @@ riot.tag2('route', '<virtual if="{show}"><yield></yield></virtual>', '', '', fun
           while (len--) { args[len] = arguments$1[len]; }
         }
 
-        this.on('updated', function () {
+        this$1.on('updated', function () {
           var tags = flatten(this$1.tags);
           if (tags.length > 0) {
             this$1.off("updated");
@@ -85,8 +83,8 @@ riot.tag2('route', '<virtual if="{show}"><yield></yield></virtual>', '', '', fun
           }
         });
 
-        this.parent.select(this);
-    }
+        this$1.parent.select(this$1);
+    };
 
     function flatten(tags) {
       return Object.keys(tags)
