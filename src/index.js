@@ -51,14 +51,29 @@ function DEFAULT_PARSER(path) {
  * @returns {array} array
  */
 function DEFAULT_SECOND_PARSER(path, filter) {
+  const names = filter.match(/\/:(\w+)/g);
   const f = filter
     .replace(/\?/g, '\\?')
     .replace(/\*/g, '([^/?#]+?)')
     .replace(/\.\./, '.*')
-  const re = new RegExp(`^${f}$`)
-  const args = path.match(re)
+    .replace(/\/:\w+/g, '(\\/[a-zA-Z0-9_\\-\\+=:\\(\\)\\[\\]\\\s+]+|)');
+  const re = new RegExp('^' + f + '$');
+  const args = path.match(re);
+  if (args) {
+    if (names) {
+      var result = {};
+      for (var i = 0; i < names.length; i++) {
+        var string = args[i + 1];
+        if (string.length > 0) {
+          result[names[i].substring(2)] = args[i + 1].substring(1);
+        }
+      }
 
-  if (args) return args.slice(1)
+      return result;
+    }
+
+    return args.slice(1)
+  }
 }
 
 /**

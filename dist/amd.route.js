@@ -170,14 +170,29 @@ define(function () { 'use strict';
    * @returns {array} array
    */
   function DEFAULT_SECOND_PARSER(path, filter) {
+    var names = filter.match(/\/:(\w+)/g);
     var f = filter
       .replace(/\?/g, '\\?')
       .replace(/\*/g, '([^/?#]+?)')
-      .replace(/\.\./, '.*');
-    var re = new RegExp(("^" + f + "$"));
+      .replace(/\.\./, '.*')
+      .replace(/\/:\w+/g, '(\\/[a-zA-Z0-9_\\-\\+=:\\(\\)\\[\\]\\\s+]+|)');
+    var re = new RegExp('^' + f + '$');
     var args = path.match(re);
+    if (args) {
+      if (names) {
+        var result = {};
+        for (var i = 0; i < names.length; i++) {
+          var string = args[i + 1];
+          if (string.length > 0) {
+            result[names[i].substring(2)] = args[i + 1].substring(1);
+          }
+        }
 
-    if (args) { return args.slice(1) }
+        return result;
+      }
+
+      return args.slice(1)
+    }
   }
 
   /**
