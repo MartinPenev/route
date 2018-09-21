@@ -9,11 +9,11 @@
       if (this.parent.opts.interceptor) {
         this.parent.opts.interceptor(this.opts).then(status => {
           if (status) {
-            this.complete(args);
+            complete(args);
           }
         });
       } else {
-        this.complete(args);
+        complete(args);
       }
     });
 

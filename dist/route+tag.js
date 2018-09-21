@@ -534,13 +534,44 @@ var route = (function (riot) {
         if (this$1.parent.opts.interceptor) {
           this$1.parent.opts.interceptor(this$1.opts).then(function (status) {
             if (status) {
-              this$1.complete(args);
+              complete(args);
             }
           });
         } else {
-          this$1.complete(args);
+          complete(args);
         }
       });
+
+      function complete(pathArgs) {
+          var arguments$1 = arguments;
+          var this$1 = this;
+
+          if (pathArgs.length == 1) {
+            args = pathArgs[0];
+          } else {
+            var args = [], len = pathArgs.length;
+            while (len--) { args[len] = arguments$1[len]; }
+          }
+
+          this.on('updated', function () {
+            var tags = flatten(this$1.tags);
+            if (tags.length > 0) {
+              this$1.off("updated");
+
+              tags.forEach(function (tag) {
+                tag.trigger.apply(tag, [ 'route' ].concat( args ));
+              });
+            }
+          });
+
+          this.parent.select(this);
+      }
+
+      function flatten(tags) {
+        return Object.keys(tags)
+          .map(function (key) { return tags[key]; })
+          .reduce(function (acc, tag) { return acc.concat(tag); }, [])
+      }
   });
 
   return route;
