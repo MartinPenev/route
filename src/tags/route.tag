@@ -9,15 +9,15 @@
       if (this.parent.opts.interceptor) {
         this.parent.opts.interceptor(this.opts).then(status => {
           if (status) {
-            complete(args);
+            this.complete(args);
           }
         });
       } else {
-        complete(args);
+        this.complete(args);
       }
     });
 
-    function complete(pathArgs) {
+    this.complete(pathArgs) {
         if (pathArgs.length == 1) {
           args = pathArgs[0];
         } else {
