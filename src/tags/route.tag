@@ -3,6 +3,20 @@
   <virtual if={ show }><yield /></virtual>
 
   <script>
+    if (this.parent && this.parent.parent) {
+      let object = riot.util.misc.extend(Object.create(this), this.parent.parent);
+      for(var key in object) {
+        if (!isNaN(key)) {
+          delete object[key];
+        } else if (key.startsWith("_")) {
+          object[key.substring(1)] = object[key];
+          delete object[key];
+        }
+      }
+
+      riot.util.misc.extend(this, object);
+    }
+
     this.show = false
 
     this.parent.route(opts.path, (...args) => {
